@@ -5,44 +5,44 @@ const Features = () => {
 
     const features = [
         {
-            icon: "💬",
-            title: "Chat Inteligente",
-            description: "Interactúa con contratos inteligentes usando lenguaje natural. No necesitas conocimientos técnicos.",
+            icon: "🤖",
+            title: "Financial AI",
+            description: "Intelligent agent that analyzes +10,000 liquidity pools in real-time using DefiLlama API.",
             gradient: "from-blue-500 to-cyan-500",
             shadow: "hover:shadow-blue-500/50"
         },
         {
-            icon: "💰",
-            title: "Gestión de Transacciones",
-            description: "Envía, recibe y consulta tus transacciones en Stacks de forma simple y segura.",
+            icon: "�",
+            title: "Best Yields",
+            description: "Automatically find the highest returns based on your risk profile and preferences.",
             gradient: "from-green-500 to-emerald-500",
             shadow: "hover:shadow-green-500/50"
         },
         {
-            icon: "🔍",
-            title: "Historial Completo",
-            description: "Visualiza todas tus interacciones y transacciones en un panel intuitivo y detallado.",
+            icon: "⚡",
+            title: "Scroll L2",
+            description: "Ultra-fast and cheap transactions. $0.02 gas vs $15 on Ethereum mainnet.",
             gradient: "from-purple-500 to-pink-500",
             shadow: "hover:shadow-purple-500/50"
         },
         {
-            icon: "🔐",
-            title: "Seguridad Total",
-            description: "Tus claves privadas permanecen contigo. Integración segura con wallets de Stacks.",
+            icon: "�",
+            title: "Natural Chat",
+            description: "Simply ask: 'Where should I invest 1000 USDC?' and the agent decides for you.",
             gradient: "from-orange-500 to-red-500",
             shadow: "hover:shadow-orange-500/50"
         },
         {
-            icon: "⚡",
-            title: "Respuestas Instantáneas",
-            description: "Procesamiento rápido de consultas y ejecución eficiente de contratos inteligentes.",
+            icon: "🔒",
+            title: "Total Security",
+            description: "Audited smart contracts. You always maintain full control of your funds.",
             gradient: "from-yellow-500 to-orange-500",
             shadow: "hover:shadow-yellow-500/50"
         },
         {
-            icon: "🌐",
-            title: "Totalmente Descentralizado",
-            description: "Sin servidores centralizados. Todo funciona directamente en la blockchain de Stacks.",
+            icon: "�",
+            title: "Smart Decisions",
+            description: "The agent analyzes TVL, risk, APY, and IL to maximize your returns automatically.",
             gradient: "from-indigo-500 to-blue-500",
             shadow: "hover:shadow-indigo-500/50"
         }
@@ -57,13 +57,13 @@ const Features = () => {
                 {/* Section Header */}
                 <div className="text-center mb-8 sm:mb-12 lg:mb-16 px-4 sm:px-0">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-kikk-white mb-3 sm:mb-4 lg:mb-6">
-                        ¿Por qué elegir{" "}
+                        Why choose{" "}
                         <span className="bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent">
-                            sBTC ChatBot?
+                            LlamaRollup?
                         </span>
                     </h2>
                     <p className="text-sm sm:text-base md:text-lg lg:text-xl text-seasalt max-w-3xl mx-auto">
-                        Combinamos la potencia de la blockchain con la simplicidad de una conversación
+                        We combine AI, real-time data from DefiLlama, and the speed of Scroll L2
                     </p>
                 </div>
 

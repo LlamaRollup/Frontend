@@ -1,8 +1,9 @@
 {
-  "name": "clarity-chatbot",
+  "name": "llamarollup",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "AI Financial Agent powered by DefiLlama + Scroll L2",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

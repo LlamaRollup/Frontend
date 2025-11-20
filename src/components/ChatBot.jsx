@@ -1,5 +1,7 @@
 /**
- * Componente de chat que permite interactuar con el contrato usando lenguaje natural
+ * LlamaRollup - AI Financial Agent Component
+ * Chatbot conversacional que analiza yields DeFi usando DefiLlama API
+ * y ejecuta inversiones optimizadas en Scroll L2
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAccount, useDisconnect, useBalance } from 'wagmi';
@@ -14,15 +16,19 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
       id: 0,
-      text: `¡Hola amigo! 👋 Soy tu asistente de Stacks.
+      text: `Hello! 🦙 I'm LlamaRollup, your AI Financial Agent.
 
-Puedo ayudarte con:
+I can help you:
 
- **Consultar tu balance** de STX
- **Realizar transferencias** seguras
- **Ver inversiones** 
+📊 **Find the best yields** in DeFi
+💰 **Analyze +10,000 liquidity pools** in real-time
+⚡ **Execute investments** on Scroll L2
+🎯 **Maximize your returns** automatically
 
-¿En qué puedo ayudarte hoy?`,
+Ask me something like:
+*"Where should I invest 1000 USDC?"* or *"Find the best APY for ETH"*
+
+How can I help you today?`,
       sender: 'bot'
     }
   ]);
@@ -474,7 +480,7 @@ Puedo ayudarte con:
   // Función para enviar mensaje al chatbot
   const sendMessage = async (message) => {
     if (!isConnected) {
-      setChatResponse('🔒 Por favor conecta tu wallet primero.');
+      setChatResponse('🔒 Please connect your wallet first.');
       return;
     }
 
@@ -543,7 +549,7 @@ Puedo ayudarte con:
     if (!isConnected || !userAddress) {
       setMessages(prev => [...prev, {
         id: Date.now(),
-        text: '🔒 Por favor conecta tu wallet primero para consultar el balance.',
+        text: '🔒 Please connect your wallet first to check balance.',
         sender: 'bot'
       }]);
       return;
@@ -615,7 +621,7 @@ Puedo ayudarte con:
       const userResponse = await fetch(`http://localhost:5000/users/wallet/${userAddress}`);
       
       if (!userResponse.ok) {
-        throw new Error('Tu wallet no está registrada. Por favor reconecta tu wallet para registrarte automáticamente.');
+        throw new Error('Your wallet is not registered. Please reconnect your wallet to register automatically.');
       }
 
       const userData = await userResponse.json();
@@ -685,8 +691,8 @@ Puedo ayudarte con:
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-jet-600">
             <img src={logoStack} alt="Logo" className="w-10 h-10 rounded-full border-2 border-giants-orange shadow-lg shadow-giants-orange/30" />
             <div>
-              <h3 className="text-seasalt font-bold text-lg">sBTC ChatBot</h3>
-              <p className="text-jet-800 text-xs">Agente Blockchain en STX</p>
+              <h3 className="text-seasalt font-bold text-lg">🦙 LlamaRollup</h3>
+              <p className="text-jet-800 text-xs">AI Financial Agent • DefiLlama + Scroll L2</p>
             </div>
           </div>
 
@@ -695,7 +701,7 @@ Puedo ayudarte con:
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-kikk-white text-sm font-semibold flex items-center gap-2 bg-kikk-orange px-3 py-2 rounded-sm flex-1 uppercase tracking-widest">
                 <span className="text-lg">👥</span> 
-                <span>Contactos</span>
+                <span>Contacts</span>
               </h4>
               {/* Botón para agregar contacto */}
               <button
@@ -714,7 +720,7 @@ Puedo ayudarte con:
               {!isConnected && (
                 <div className="p-4 rounded-sm bg-kikk-black border border-kikk-gray text-center">
                   <p className="text-kikk-gray text-xs uppercase tracking-wider">
-                    🔒 Conecta tu wallet para ver contactos
+                    🔒 Connect your wallet to view contacts
                   </p>
                 </div>
               )}
@@ -723,7 +729,7 @@ Puedo ayudarte con:
               {isConnected && loadingContacts && (
                 <div className="flex flex-col items-center justify-center py-6">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-kikk-orange"></div>
-                  <p className="text-kikk-gray text-xs mt-2">Cargando contactos...</p>
+                  <p className="text-kikk-gray text-xs mt-2">Loading contacts...</p>
                 </div>
               )}
 
@@ -749,7 +755,7 @@ Puedo ayudarte con:
                 <div className="p-4 rounded-sm bg-kikk-black border border-kikk-gray text-center">
                   <p className="text-2xl mb-2">📭</p>
                   <p className="text-kikk-gray text-xs">
-                    No tienes contactos aún
+                    You don't have contacts yet
                   </p>
                   <p className="text-kikk-orange text-xs mt-1">
                     Haz clic en + para agregar
@@ -780,13 +786,13 @@ Puedo ayudarte con:
               {!isConnected || !userAddress ? (
                 <div className="p-4 rounded-lg bg-jet-600 bg-opacity-30 border border-jet-600 text-center">
                   <p className="text-jet-800 text-xs">
-                    🔒 Conecta tu wallet para ver el historial
+                    🔒 Connect your wallet to view history
                   </p>
                 </div>
               ) : loadingHistory ? (
                 <div className="flex flex-col items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-giants-orange"></div>
-                  <p className="text-jet-800 text-xs mt-2">Cargando...</p>
+                  <p className="text-jet-800 text-xs mt-2">Loading...</p>
                 </div>
               ) : recentTransactions.length === 0 ? (
                 <div className="p-4 rounded-lg bg-licorice-300 border border-jet-600 text-center">
@@ -939,7 +945,7 @@ Puedo ayudarte con:
             <img src={logoStack} alt="Logo" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-giants-orange shadow-md hover:shadow-giants-orange/50 transition-shadow" />
             <div>
               <h2 className="text-seasalt font-bold text-sm sm:text-base flex items-center gap-2">
-                <span>sBTC ChatBot</span>
+                <span>🦙 LlamaRollup</span>
                 {isConnected && <span className="text-green-400 text-xs">●</span>}
               </h2>
               {isConnected && (
@@ -1076,7 +1082,7 @@ Puedo ayudarte con:
               <div className="flex justify-center px-2 sm:px-4">
                 <div className="bg-gradient-to-r from-sandy-brown to-rust border-2 border-sandy-brown text-seasalt px-3 sm:px-4 md:px-5 py-2 sm:py-3 rounded-lg shadow-lg shadow-sandy-brown/30 flex items-center gap-2 sm:gap-3 font-semibold text-xs sm:text-sm md:text-base">
                   <span className="text-base sm:text-lg md:text-xl animate-spin">⏳</span>
-                  <span>Procesando transacción...</span>
+                  <span>Processing transaction...</span>
                 </div>
               </div>
             )}
@@ -1097,10 +1103,17 @@ Puedo ayudarte con:
             </button>
             
             <button
-              onClick={() => handleShortcut('¿Cómo puedo hacer una transferencia?')}
+              onClick={() => handleShortcut('What is the best yield for USDC?')}
               className="px-4 py-2 bg-licorice hover:bg-jet-400 text-seasalt rounded-full text-xs sm:text-sm whitespace-nowrap border border-jet-600 hover:border-giants-orange transition-colors"
             >
-              💸 Quiero enviar STX
+              📊 Best Yield
+            </button>
+
+            <button
+              onClick={() => handleShortcut('Find high APY on Scroll')}
+              className="px-4 py-2 bg-licorice hover:bg-jet-400 text-seasalt rounded-full text-xs sm:text-sm whitespace-nowrap border border-jet-600 hover:border-giants-orange transition-colors"
+            >
+              ⚡ Scroll Pools
             </button>
           </div>
 
@@ -1159,10 +1172,10 @@ Puedo ayudarte con:
                 }}
                 placeholder={
                   listening 
-                    ? "🎤 Escuchando... Habla claramente" 
+                    ? "🎤 Listening... Speak clearly" 
                     : isConnected 
-                      ? "Escribe un mensaje..." 
-                      : "Conecta tu wallet para comenzar"
+                      ? "Type a message..." 
+                      : "Connect your wallet to start"
                 }
                 disabled={!isConnected || isChatLoading}
                 rows={1}

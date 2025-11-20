@@ -3,29 +3,29 @@ const HowItWorks = () => {
     {
       number: "01",
       title: "Conecta tu Wallet",
-      description: "Vincula tu wallet de Stacks (Leather, Xverse o Hiro) de forma segura. Tus claves permanecen privadas.",
+      description: "Vincula tu wallet (MetaMask, Rainbow, etc.) a Scroll L2. Tus claves permanecen seguras contigo.",
       icon: "🔗",
       color: "from-blue-500 to-cyan-500"
     },
     {
       number: "02",
-      title: "Inicia una Conversación",
-      description: "Pregunta lo que necesites en lenguaje natural. Nuestro chatbot interpreta tu intención.",
-      icon: "💭",
+      title: "Pregunta en Lenguaje Natural",
+      description: "Di: 'Encuentra el mejor yield para mis 1000 USDC'. El agente entiende tu intención y analiza miles de opciones.",
+      icon: "�",
       color: "from-purple-500 to-pink-500"
     },
     {
       number: "03",
-      title: "Ejecuta Transacciones",
-      description: "Envía STX, consulta balances, interactúa con contratos. Todo desde el chat.",
-      icon: "⚡",
+      title: "IA Analiza con DefiLlama",
+      description: "El agente consulta +10,000 pools en tiempo real, filtra por riesgo, TVL y APY, y te recomienda la mejor opción.",
+      icon: "🧠",
       color: "from-indigo-500 to-blue-500"
     },
     {
       number: "04",
-      title: "Revisa tu Historial",
-      description: "Accede a un historial completo de todas tus transacciones y conversaciones.",
-      icon: "📊",
+      title: "Ejecuta en Scroll L2",
+      description: "Confirma la transacción y deposita en el pool recomendado. Gas ultra-bajo (~$0.02) y confirmación instantánea.",
+      icon: "⚡",
       color: "from-green-500 to-emerald-500"
     }
   ];
@@ -39,13 +39,13 @@ const HowItWorks = () => {
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-kikk-white mb-3 sm:mb-4 lg:mb-6">
-            ¿Cómo{" "}
+            How Does It{" "}
             <span className="bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent">
-              Funciona?
+              Work?
             </span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-seasalt max-w-2xl mx-auto">
-            Cuatro pasos simples para comenzar a usar blockchain sin complicaciones
+            From question to optimized investment in less than 30 seconds
           </p>
         </div>
 
@@ -102,7 +102,7 @@ const HowItWorks = () => {
         <div className="mt-12 sm:mt-16 lg:mt-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-gray-700 font-medium text-sm sm:text-base">Simple, Rápido y Seguro</span>
+            <span className="text-gray-700 font-medium text-sm sm:text-base">AI + DefiLlama + Scroll L2 = Maximum Returns</span>
           </div>
         </div>
       </div>

@@ -1,85 +1,85 @@
 const Roadmap = () => {
   const phases = [
     {
-      phase: "Fase 1",
-      title: "MVP & Fundamentos",
-      status: "Completado",
-      date: "Q4 2024",
+      phase: "Phase 1",
+      title: "MVP & Base Integration",
+      status: "Completed",
+      date: "Current",
       items: [
-        "Chatbot básico con IA",
-        "Integración con Stacks Wallet",
-        "Consultas de balance",
-        "Interfaz de usuario inicial"
+        "Conversational AI Chatbot",
+        "DefiLlama API Integration",
+        "Scroll L2 Deployment",
+        "Basic yield analysis"
       ],
       color: "from-green-500 to-emerald-500",
       statusColor: "bg-green-500"
     },
     {
-      phase: "Fase 2",
-      title: "Transacciones & Historial",
-      status: "En Progreso",
-      date: "Q1 2025",
+      phase: "Phase 2",
+      title: "Advanced AI Agent",
+      status: "In Progress",
+      date: "Q1 2026",
       items: [
-        "Envío y recepción de STX",
-        "Historial de transacciones",
-        "Panel de analytics",
-        "Notificaciones en tiempo real"
+        "Multi-chain (Arbitrum, Optimism, Base)",
+        "Automatic portfolio tracking",
+        "Smart rebalancing",
+        "APY change alerts"
       ],
       color: "from-blue-500 to-cyan-500",
       statusColor: "bg-blue-500"
     },
     {
-      phase: "Fase 3",
-      title: "Smart Contracts",
-      status: "Planificado",
-      date: "Q2 2025",
+      phase: "Phase 3",
+      title: "Complex Strategies",
+      status: "Planned",
+      date: "Q2 2026",
       items: [
-        "Deployment de contratos",
-        "Interacción con contratos existentes",
-        "Editor de Clarity integrado",
-        "Testing automatizado"
+        "Multi-pool yield farming",
+        "Strategy backtesting",
+        "Auto-compounding",
+        "Advanced risk management"
       ],
       color: "from-purple-500 to-pink-500",
       statusColor: "bg-purple-500"
     },
     {
-      phase: "Fase 4",
-      title: "DeFi & sBTC",
-      status: "Futuro",
-      date: "Q3 2025",
+      phase: "Phase 4",
+      title: "Social & DAO",
+      status: "Future",
+      date: "Q3 2026",
       items: [
-        "Integración con protocolos DeFi",
-        "Soporte para sBTC",
-        "Yield farming asistido",
-        "Portfolio tracking avanzado"
+        "Social trading (copy strategies)",
+        "DAO for agent governance",
+        "Strategy marketplace",
+        "Position NFTs"
       ],
       color: "from-giants-orange to-sandy-brown",
       statusColor: "bg-giants-orange"
     },
     {
-      phase: "Fase 5",
-      title: "NFTs & Marketplace",
-      status: "Futuro",
-      date: "Q4 2025",
+      phase: "Phase 5",
+      title: "Enterprise & API",
+      status: "Future",
+      date: "Q4 2026",
       items: [
-        "Gestión de NFTs",
-        "Marketplace integrado",
-        "Creación de colecciones",
-        "Trading automatizado"
+        "Public API for developers",
+        "Enterprise solutions",
+        "White-label for DAOs",
+        "CEX integration"
       ],
       color: "from-pink-500 to-rose-500",
       statusColor: "bg-pink-500"
     },
     {
-      phase: "Fase 6",
-      title: "Ecosistema & DAO",
-      status: "Futuro",
-      date: "2026",
+      phase: "Phase 6",
+      title: "AI Agents Network",
+      status: "Future",
+      date: "2027",
       items: [
-        "Gobernanza descentralizada",
-        "Token propio del proyecto",
-        "API pública",
-        "Plugins de terceros"
+        "Specialized agents network",
+        "Cross-chain arbitrage",
+        "Predictive analytics ML",
+        "Autonomous treasury management"
       ],
       color: "from-indigo-500 to-blue-500",
       statusColor: "bg-indigo-500"
@@ -99,13 +99,13 @@ const Roadmap = () => {
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-3 sm:mb-4 lg:mb-6">
-            Nuestro{" "}
+            Our{" "}
             <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
               Roadmap
             </span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto">
-            El futuro del chatbot blockchain, paso a paso
+            The future of AI financial agents, step by step
           </p>
         </div>
 

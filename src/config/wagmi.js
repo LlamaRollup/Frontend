@@ -29,7 +29,7 @@ const scrollSepolia = defineChain({
 });
 
 export const config = getDefaultConfig({
-  appName: 'sBTC ChatBot',
+  appName: 'LlamaRollup - AI Financial Agent',
   projectId: 'YOUR_WALLETCONNECT_PROJECT_ID', // Obtén uno gratis en https://cloud.walletconnect.com
   chains: [scrollSepolia],
   ssr: false,

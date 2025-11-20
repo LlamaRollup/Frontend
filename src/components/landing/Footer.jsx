@@ -2,29 +2,29 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    producto: [
-      { name: "Características", href: "#features" },
-      { name: "Cómo Funciona", href: "#how-it-works" },
+    product: [
+      { name: "Features", href: "#features" },
+      { name: "How It Works", href: "#how-it-works" },
       { name: "Roadmap", href: "#roadmap" },
-      { name: "Equipo", href: "#team" }
+      { name: "Team", href: "#team" }
     ],
-    recursos: [
-      { name: "Documentación", href: "#" },
-      { name: "API", href: "#" },
-      { name: "GitHub", href: "https://github.com" },
-      { name: "Whitepaper", href: "#" }
+    resources: [
+      { name: "DefiLlama Docs", href: "https://docs.llama.fi" },
+      { name: "Scroll Network", href: "https://scroll.io" },
+      { name: "GitHub", href: "https://github.com/LlamaRollup" },
+      { name: "Smart Contracts", href: "#" }
     ],
-    comunidad: [
+    community: [
       { name: "Discord", href: "#" },
       { name: "Twitter", href: "#" },
       { name: "Telegram", href: "#" },
       { name: "Blog", href: "#" }
     ],
     legal: [
-      { name: "Términos de Uso", href: "#" },
-      { name: "Privacidad", href: "#" },
-      { name: "Cookies", href: "#" },
-      { name: "Licencia", href: "#" }
+      { name: "Terms of Service", href: "#" },
+      { name: "Privacy", href: "#" },
+      { name: "Audits", href: "#" },
+      { name: "MIT License", href: "#" }
     ]
   };
 
@@ -84,26 +84,34 @@ const Footer = () => {
           {/* Brand section */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                sBTC ChatBot
+              <span className="text-2xl">🦙</span>
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent">
+                LlamaRollup
               </span>
             </div>
             <p className="text-gray-400 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-              El futuro de las interacciones blockchain. Simple, seguro y descentralizado.
+              AI Financial Agent that maximizes your DeFi yields. Powered by DefiLlama + Scroll L2.
             </p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30">DefiLlama</span>
+              <span className="px-3 py-1 bg-orange-500/20 text-orange-300 rounded-full border border-orange-500/30">Scroll L2</span>
+              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">AI Agent</span>
+            </div>
           </div>
         </div>
 
         {/* Bottom bar */}
         <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
           <p className="text-gray-400 text-xs sm:text-sm">
-            © {currentYear} sBTC ChatBot. Todos los derechos reservados.
+            © {currentYear} LlamaRollup. Made with 🦙 and ❤️ to democratize DeFi.
           </p>
           <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-400">
             <span>Powered by</span>
-            <span className="font-semibold text-orange-500">Stacks Blockchain</span>
+            <span className="font-semibold text-blue-400">DefiLlama</span>
             <span>•</span>
-            <span className="font-semibold text-purple-500">Clarity</span>
+            <span className="font-semibold text-orange-400">Scroll L2</span>
+            <span>•</span>
+            <span className="font-semibold text-purple-400">OpenAI</span>
           </div>
         </div>
       </div>
