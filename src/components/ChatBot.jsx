@@ -5,8 +5,10 @@
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAccount, useDisconnect, useBalance, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { getSTXTransfers, sendChatMessage } from '../services/chatService';
+import { getSTXTransfers, sendChatMessage, prepareTransfer } from '../services/chatService';
+import { getBalance, getUserContacts, createContact } from '../services/scrollSepoliaService';
 import TransactionHistory from './TransactionHistory';
 import logoStack from '../assets/logo_stack.png';
 import logoChatBot from '../assets/logoChatBot.png';
@@ -534,10 +536,32 @@ How can I help you today?`,
       if (response && response.message) {
         setChatResponse(response.message);
         
-        // Si hay una acción específica, puedes manejarla aquí
+        // Si hay una acción específica, manejarla aquí
         if (response.action === 'transfer') {
-          // Manejar lógica de transferencia si es necesario
+          // Transferencia detectada - mostrar modal de confirmación
           console.log('Transfer action detected:', response);
+          
+          const transferData = {
+            recipient: response.recipient,
+            amount: response.amount,
+            recipientName: response.recipient_name || null,
+            contactId: response.contact_id || null
+          };
+          
+          setPendingTransfer(transferData);
+          
+          // Mensaje de confirmación
+          const recipientDisplay = response.recipient_name 
+            ? `**${response.recipient_name}** (${response.recipient.substring(0, 10)}...)` 
+            : `${response.recipient.substring(0, 10)}...${response.recipient.substring(response.recipient.length - 8)}`;
+          
+          setChatResponse(
+            `✅ Transferencia preparada:\n\n` +
+            `💰 **Cantidad:** ${response.amount} ETH\n` +
+            `📤 **Destinatario:** ${recipientDisplay}\n\n` +
+            `⚠️ **Por favor confirma la transferencia abajo.**`
+          );
+          
         } else if (response.action === 'balance') {
           // Ya se maneja con handleBalanceCheck
           console.log('Balance check action');
@@ -563,7 +587,7 @@ How can I help you today?`,
       const { recipient, amount } = pendingTransfer;
       
       // Preparar transferencia en el backend (obtener estimación)
-      const prepData = await prepareTransfer(recipient, amount, userAddress);
+      const prepData = await prepareTransfer(userAddress, recipient, amount);
       
       // Mostrar mensaje de preparación
       setMessages(prev => [...prev, {
@@ -572,12 +596,14 @@ How can I help you today?`,
         sender: 'bot'
       }]);
       
-      // Enviar transacción usando wagmi
+      // Convertir amount a Wei
       const amountWei = parseEther(amount.toString());
       
+      // Enviar transacción al contrato STXTransfer usando wagmi
       sendTransaction({
-        to: recipient,
-        value: amountWei,
+        to: prepData.contract_address, // Dirección del contrato
+        value: amountWei, // Cantidad en Wei
+        data: undefined // El contrato maneja la transferencia automáticamente con receive
       });
       
       setPendingTransfer(null);
@@ -585,6 +611,7 @@ How can I help you today?`,
       console.error('Error in transfer:', error);
       setChatResponse('❌ Error en la transferencia: ' + error.message);
       setIsTransactionPending(false);
+      setPendingTransfer(null);
     }
   };
 
@@ -692,7 +719,7 @@ How can I help you today?`,
       const userId = userData.user.id;
 
       // 2. Crear el contacto usando el servicio
-      await createContactAPI(userId, newContactName.trim(), newContactWallet.trim());
+      await createContact(userId, newContactName.trim(), newContactWallet.trim());
 
       // 3. Éxito: cerrar modal y limpiar campos
       alert(`✅ Contacto "${newContactName}" agregado exitosamente`);
@@ -1093,9 +1120,15 @@ How can I help you today?`,
                         <span className="text-xs sm:text-sm md:text-base">Cantidad:</span>
                       </strong> 
                       <span className="text-sandy-brown font-bold text-base sm:text-lg md:text-xl lg:text-2xl">
-                        {pendingTransfer.amount} STX
+                        {pendingTransfer.amount} ETH
                       </span>
                     </p>
+                    {pendingTransfer.recipientName && (
+                      <p className="text-xs sm:text-sm text-green-400 mt-2 sm:mt-3 flex items-center gap-2">
+                        <span className="text-base sm:text-lg">👤</span>
+                        <span>Contacto: <strong>{pendingTransfer.recipientName}</strong></span>
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <button 
