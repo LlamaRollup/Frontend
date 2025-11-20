@@ -2,9 +2,20 @@
  * Componente de chat que permite interactuar con el contrato usando lenguaje natural
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useAccount, useDisconnect, useBalance } from 'wagmi';
+import { useAccount, useDisconnect, useBalance, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { parseEther } from 'viem';
 import { getSTXTransfers } from '../services/chatService';
+import { 
+  sendChatMessage, 
+  getBalance, 
+  prepareTransfer,
+  checkTransaction,
+  getUserByWallet,
+  createUser,
+  getUserContacts,
+  createContact as createContactAPI
+} from '../services/scrollSepoliaService';
 import TransactionHistory from './TransactionHistory';
 import logoStack from '../assets/logo_stack.png';
 import logoChatBot from '../assets/logoChatBot.png';
@@ -14,13 +25,13 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
       id: 0,
-      text: `¡Hola amigo! 👋 Soy tu asistente de Stacks.
+      text: `¡Hola amigo! 👋 Soy tu asistente de Scroll Sepolia.
 
 Puedo ayudarte con:
 
- **Consultar tu balance** de STX
- **Realizar transferencias** seguras
- **Ver inversiones** 
+ **Consultar tu balance** de ETH
+ **Realizar transferencias** seguras en Scroll Sepolia
+ **Gestionar contactos** para transferencias rápidas
 
 ¿En qué puedo ayudarte hoy?`,
       sender: 'bot'
@@ -318,11 +329,15 @@ Puedo ayudarte con:
     );
   };
   
-  // Hooks de wagmi para conectar wallet
+  // Hooks de wagmi para conectar wallet y enviar transacciones
   const { address: userAddress, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { data: balanceData } = useBalance({
     address: userAddress,
+  });
+  const { data: txHash, sendTransaction, isPending: isSending } = useSendTransaction();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
   });
 
   // Estados del chat
@@ -471,6 +486,43 @@ Puedo ayudarte con:
     }
   }, [input]);
 
+  // Monitorear estado de la transacción
+  useEffect(() => {
+    if (isConfirmed && txHash) {
+      setIsTransactionPending(false);
+      
+      // Mostrar mensaje de éxito con el hash de la transacción
+      const explorerUrl = `https://sepolia.scrollscan.com/tx/${txHash}`;
+      
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: `✅ **Transferencia completada exitosamente!**\n\n📋 Hash: ${txHash.substring(0, 10)}...${txHash.substring(txHash.length - 8)}\n\n🔗 [Ver en explorador](${explorerUrl})`,
+        sender: 'bot',
+        txId: txHash,
+        explorerUrl: explorerUrl
+      }]);
+    }
+  }, [isConfirmed, txHash]);
+
+  // Mostrar estado de envío
+  useEffect(() => {
+    if (isSending) {
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: '⏳ Enviando transacción a Scroll Sepolia...\n\nPor favor confirma en tu wallet.',
+        sender: 'bot'
+      }]);
+    }
+    
+    if (isConfirming && !isSending) {
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: '⏳ Esperando confirmación en la blockchain...\n\nEsto puede tomar unos segundos.',
+        sender: 'bot'
+      }]);
+    }
+  }, [isSending, isConfirming]);
+
   // Función para enviar mensaje al chatbot
   const sendMessage = async (message) => {
     if (!isConnected) {
@@ -480,15 +532,54 @@ Puedo ayudarte con:
 
     setIsChatLoading(true);
     try {
-      // Aquí puedes implementar la lógica de tu chatbot
-      // Por ahora, solo simularemos una respuesta
-      setTimeout(() => {
-        setChatResponse(`Recibí tu mensaje: "${message}". (Funcionalidad del chatbot en desarrollo)`);
-        setIsChatLoading(false);
-      }, 1000);
+      // Enviar mensaje al backend con DeepSeek
+      const response = await sendChatMessage(message, userAddress);
+      
+      const action = response.action;
+      
+      // Procesar respuesta según la acción
+      if (action === 'balance') {
+        // Consultar balance
+        await handleBalanceCheckBackend();
+      } else if (action === 'transfer') {
+        // Preparar transferencia
+        const recipient = response.recipient;
+        const amount = response.amount;
+        
+        if (recipient && amount) {
+          setPendingTransfer({
+            recipient,
+            amount,
+            recipientName: response.recipient_name || null
+          });
+          setChatResponse(
+            `💸 **Transferencia preparada**\n\n` +
+            `• Destinatario: ${response.recipient_name || 'Wallet desconocida'}\n` +
+            `• Dirección: ${recipient.substring(0, 10)}...${recipient.substring(recipient.length - 8)}\n` +
+            `• Monto: ${amount} ETH\n\n` +
+            `¿Deseas confirmar esta transferencia?`
+          );
+        } else {
+          setChatResponse(response.message || '❌ No se pudo procesar la transferencia');
+        }
+      } else if (action === 'network_info') {
+        // Mostrar información de la red
+        setChatResponse(
+          `🌐 **Red Scroll Sepolia**\n\n` +
+          `• Chain ID: 534351\n` +
+          `• RPC: sepolia-rpc.scroll.io\n` +
+          `• Explorador: sepolia.scrollscan.com\n` +
+          `• Moneda: ETH`
+        );
+      } else {
+        // Respuesta genérica del chatbot
+        setChatResponse(response.message || 'Recibí tu mensaje.');
+      }
+      
+      setIsChatLoading(false);
     } catch (error) {
       console.error('Error sending message:', error);
-      setChatResponse('❌ Error al procesar tu mensaje.');
+      setChatResponse('❌ Error al procesar tu mensaje: ' + error.message);
       setIsChatLoading(false);
     }
   };
@@ -499,16 +590,30 @@ Puedo ayudarte con:
     
     setIsTransactionPending(true);
     try {
-      // Aquí implementarías la lógica de transferencia
-      // Por ahora, solo simulamos
-      setTimeout(() => {
-        setChatResponse('✅ Transferencia completada exitosamente!');
-        setPendingTransfer(null);
-        setIsTransactionPending(false);
-      }, 2000);
+      const { recipient, amount } = pendingTransfer;
+      
+      // Preparar transferencia en el backend (obtener estimación)
+      const prepData = await prepareTransfer(recipient, amount, userAddress);
+      
+      // Mostrar mensaje de preparación
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: `⏳ Preparando transacción...\n\n• Gas estimado: ${prepData.gas_estimate}\n• Precio del gas: ${prepData.gas_price_gwei.toFixed(2)} Gwei\n• Fee estimado: ${prepData.estimated_fee_eth.toFixed(6)} ETH`,
+        sender: 'bot'
+      }]);
+      
+      // Enviar transacción usando wagmi
+      const amountWei = parseEther(amount.toString());
+      
+      sendTransaction({
+        to: recipient,
+        value: amountWei,
+      });
+      
+      setPendingTransfer(null);
     } catch (error) {
       console.error('Error in transfer:', error);
-      setChatResponse('❌ Error en la transferencia.');
+      setChatResponse('❌ Error en la transferencia: ' + error.message);
       setIsTransactionPending(false);
     }
   };
@@ -538,7 +643,7 @@ Puedo ayudarte con:
     textareaRef.current?.focus();
   };
 
-  // Función para consultar el balance usando Hiro API
+  // Función para consultar el balance usando el backend
   const handleBalanceCheck = async () => {
     if (!isConnected || !userAddress) {
       setMessages(prev => [...prev, {
@@ -552,27 +657,17 @@ Puedo ayudarte con:
     // Mostrar mensaje de carga
     setMessages(prev => [...prev, {
       id: Date.now(),
-      text: '💰 Consultando tu balance...',
+      text: '💰 Consultando tu balance en Scroll Sepolia...',
       sender: 'bot'
     }]);
 
     try {
-      // Consultar balance desde Hiro API
-      const HIRO_API = "https://api.testnet.hiro.so"; // Cambiar a mainnet si es necesario
-      const response = await fetch(`${HIRO_API}/extended/v1/address/${userAddress}/balances`);
+      const balanceInfo = await getBalance(userAddress);
       
-      if (!response.ok) {
-        throw new Error('Error al consultar el balance');
-      }
-
-      const data = await response.json();
-      const balanceInMicroSTX = data.stx.balance;
-      const balanceInSTX = (balanceInMicroSTX / 1_000_000).toFixed(6);
-
       // Mostrar el balance en el chat
       setMessages(prev => [...prev, {
         id: Date.now(),
-        text: `💰 **Tu saldo es ${balanceInSTX} STX**\n\n📊 Detalles:\n• Balance disponible: ${balanceInSTX} STX\n• Dirección: ${userAddress.substring(0, 10)}...${userAddress.substring(userAddress.length - 6)}`,
+        text: `💰 **Tu saldo es ${balanceInfo.balance} ETH**\n\n📊 Detalles:\n• Balance disponible: ${balanceInfo.balance} ETH\n• Red: ${balanceInfo.network}\n• Dirección: ${userAddress.substring(0, 10)}...${userAddress.substring(userAddress.length - 6)}`,
         sender: 'bot'
       }]);
     } catch (error) {
@@ -583,6 +678,11 @@ Puedo ayudarte con:
         sender: 'bot'
       }]);
     }
+  };
+
+  // Función backend de balance (usada por el chatbot)
+  const handleBalanceCheckBackend = async () => {
+    await handleBalanceCheck();
   };
 
   const handleContactSelect = (contact) => {
@@ -597,9 +697,9 @@ Puedo ayudarte con:
       return;
     }
 
-    // Validar formato de wallet
-    if (!newContactWallet.startsWith('ST') && !newContactWallet.startsWith('SP')) {
-      alert('⚠️ La dirección debe comenzar con ST o SP');
+    // Validar formato de wallet Ethereum
+    if (!newContactWallet.startsWith('0x') || newContactWallet.length !== 42) {
+      alert('⚠️ La dirección debe ser una wallet Ethereum válida (0x...)');
       return;
     }
 
@@ -612,33 +712,11 @@ Puedo ayudarte con:
 
     try {
       // 1. Obtener el user_id del usuario actual por su wallet
-      const userResponse = await fetch(`http://localhost:5000/users/wallet/${userAddress}`);
-      
-      if (!userResponse.ok) {
-        throw new Error('Tu wallet no está registrada. Por favor reconecta tu wallet para registrarte automáticamente.');
-      }
-
-      const userData = await userResponse.json();
+      const userData = await getUserByWallet(userAddress);
       const userId = userData.user.id;
 
-      // 2. Crear el contacto
-      const contactResponse = await fetch('http://localhost:5000/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          nombre: newContactName.trim(),
-          wallet_address: newContactWallet.trim()
-        })
-      });
-
-      const contactData = await contactResponse.json();
-
-      if (!contactResponse.ok) {
-        throw new Error(contactData.error || 'Error al crear el contacto');
-      }
+      // 2. Crear el contacto usando el servicio
+      await createContactAPI(userId, newContactName.trim(), newContactWallet.trim());
 
       // 3. Éxito: cerrar modal y limpiar campos
       alert(`✅ Contacto "${newContactName}" agregado exitosamente`);
@@ -647,18 +725,15 @@ Puedo ayudarte con:
       setNewContactWallet('');
 
       // 4. Recargar la lista de contactos
-      const reloadResponse = await fetch(`http://localhost:5000/users/wallet/${userAddress}/contacts`);
-      if (reloadResponse.ok) {
-        const data = await reloadResponse.json();
-        if (data.success && data.contacts) {
-          const formattedContacts = data.contacts.map(contact => ({
-            id: contact.id,
-            name: contact.nombre,
-            address: contact.wallet_address
-          }));
-          setContacts(formattedContacts);
-          console.log(`✅ Lista de contactos actualizada: ${formattedContacts.length} contactos`);
-        }
+      const contactsData = await getUserContacts(userAddress);
+      if (contactsData.success && contactsData.contacts) {
+        const formattedContacts = contactsData.contacts.map(contact => ({
+          id: contact.id,
+          name: contact.nombre,
+          address: contact.wallet_address
+        }));
+        setContacts(formattedContacts);
+        console.log(`✅ Lista de contactos actualizada: ${formattedContacts.length} contactos`);
       }
 
       // 5. Mostrar mensaje en el chat
