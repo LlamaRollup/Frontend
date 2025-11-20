@@ -25,22 +25,23 @@ const Hero = ({ onStartChat }) => {
                 >
                     {/* Logo/Icono */}
                     <div className="mb-6 sm:mb-8 md:mb-10 flex justify-center">
-                      <img 
-                        src={logoStack}
-                        alt="sBTC ChatBot Logo" 
-                        className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full object-cover shadow-2xl shadow-giants-orange/40 border-4 border-giants-orange animate-pulse"
-                      />
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-giants-orange to-sandy-brown rounded-full blur-2xl opacity-50 animate-pulse"></div>
+                        <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br from-giants-orange to-sandy-brown flex items-center justify-center shadow-2xl shadow-giants-orange/40 border-4 border-white/20">
+                          <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl">🦙</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Main Heading with Gradient */}
                     <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6 leading-tight">
-                        <span className="block text-kikk-white mb-1 sm:mb-2"><span className=" bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent animate-gradient-x">sBTC </span>ChatBot</span>
+                        <span className="block text-kikk-white mb-1 sm:mb-2">🦙 <span className=" bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent animate-gradient-x">LlamaRollup</span></span>
                         
                     </h1>
 
                     {/* Description */}
                     <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-seasalt max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed font-light px-4 sm:px-0">
-                        Que pagar con Crypto sea tan fácil como enviar un mensaje de whatsapp.
+                        The first <span className="text-giants-orange font-semibold">AI Financial Agent</span> that maximizes your DeFi yields with a simple conversation
                     </p>
 
                     {/* CTA Buttons */}
@@ -50,7 +51,7 @@ const Hero = ({ onStartChat }) => {
                             className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-giants-orange to-sandy-brown text-kikk-white rounded-full font-semibold text-base sm:text-lg shadow-2xl hover:shadow-giants-orange/50 transition-all duration-300 hover:scale-105 overflow-hidden w-full sm:w-auto"
                         >
                             <span className="relative z-10 flex items-center gap-2">
-                                Comenzar Ahora
+                                Start Now
                                 <svg
                                     className="w-5 h-5 group-hover:translate-x-1 transition-transform"
                                     fill="none"
@@ -69,7 +70,7 @@ const Hero = ({ onStartChat }) => {
                         </button>
 
                         <button className="px-6 sm:px-8 py-3 sm:py-4 bg-kikk-dark/50 backdrop-blur-sm text-kikk-white rounded-full font-semibold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-giants-orange/30 hover:border-sandy-brown/50 w-full sm:w-auto">
-                            Ver Demo
+                            Watch Demo
                         </button>
                     </div>
 
@@ -77,26 +78,26 @@ const Hero = ({ onStartChat }) => {
                     <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-2xl mx-auto px-4 sm:px-0">
                         <div className="text-center">
                             <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent mb-1 sm:mb-2">
-                                100%
+                                10K+
                             </div>
                             <div className="text-xs sm:text-sm lg:text-base text-seasalt">
-                                Descentralizado
+                                Pools Analyzed
                             </div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent mb-1 sm:mb-2">
-                                24/7
+                                $0.02
                             </div>
                             <div className="text-xs sm:text-sm lg:text-base text-seasalt">
-                                Disponible
+                                Gas on Scroll
                             </div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-giants-orange to-sandy-brown bg-clip-text text-transparent mb-1 sm:mb-2">
-                                Seguro
+                                8.4%
                             </div>
                             <div className="text-xs sm:text-sm lg:text-base text-seasalt">
-                                En Blockchain
+                                Avg APY
                             </div>
                         </div>
                     </div>

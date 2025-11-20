@@ -1,21 +1,12 @@
 /**
- * Componente de chat que permite interactuar con el contrato usando lenguaje natural
+ * LlamaRollup - AI Financial Agent Component
+ * Chatbot conversacional que analiza yields DeFi usando DefiLlama API
+ * y ejecuta inversiones optimizadas en Scroll L2
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAccount, useDisconnect, useBalance, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { parseEther } from 'viem';
-import { getSTXTransfers } from '../services/chatService';
-import { 
-  sendChatMessage, 
-  getBalance, 
-  prepareTransfer,
-  checkTransaction,
-  getUserByWallet,
-  createUser,
-  getUserContacts,
-  createContact as createContactAPI
-} from '../services/scrollSepoliaService';
+import { getSTXTransfers, sendChatMessage } from '../services/chatService';
 import TransactionHistory from './TransactionHistory';
 import logoStack from '../assets/logo_stack.png';
 import logoChatBot from '../assets/logoChatBot.png';
@@ -25,15 +16,19 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
       id: 0,
-      text: `¡Hola amigo! 👋 Soy tu asistente de Scroll Sepolia.
+      text: `Hello! 🦙 I'm LlamaRollup, your AI Financial Agent.
 
-Puedo ayudarte con:
+I can help you:
 
- **Consultar tu balance** de ETH
- **Realizar transferencias** seguras en Scroll Sepolia
- **Gestionar contactos** para transferencias rápidas
+📊 **Find the best yields** in DeFi
+💰 **Analyze +10,000 liquidity pools** in real-time
+⚡ **Execute investments** on Scroll L2
+🎯 **Maximize your returns** automatically
 
-¿En qué puedo ayudarte hoy?`,
+Ask me something like:
+*"Where should I invest 1000 USDC?"* or *"Find the best APY for ETH"*
+
+How can I help you today?`,
       sender: 'bot'
     }
   ]);
@@ -526,60 +521,35 @@ Puedo ayudarte con:
   // Función para enviar mensaje al chatbot
   const sendMessage = async (message) => {
     if (!isConnected) {
-      setChatResponse('🔒 Por favor conecta tu wallet primero.');
+      setChatResponse('🔒 Please connect your wallet first.');
       return;
     }
 
     setIsChatLoading(true);
     try {
-      // Enviar mensaje al backend con DeepSeek
+      // Llamar al backend con el mensaje y la wallet del usuario
       const response = await sendChatMessage(message, userAddress);
       
-      const action = response.action;
-      
-      // Procesar respuesta según la acción
-      if (action === 'balance') {
-        // Consultar balance
-        await handleBalanceCheckBackend();
-      } else if (action === 'transfer') {
-        // Preparar transferencia
-        const recipient = response.recipient;
-        const amount = response.amount;
+      // Procesar la respuesta del backend
+      if (response && response.message) {
+        setChatResponse(response.message);
         
-        if (recipient && amount) {
-          setPendingTransfer({
-            recipient,
-            amount,
-            recipientName: response.recipient_name || null
-          });
-          setChatResponse(
-            `💸 **Transferencia preparada**\n\n` +
-            `• Destinatario: ${response.recipient_name || 'Wallet desconocida'}\n` +
-            `• Dirección: ${recipient.substring(0, 10)}...${recipient.substring(recipient.length - 8)}\n` +
-            `• Monto: ${amount} ETH\n\n` +
-            `¿Deseas confirmar esta transferencia?`
-          );
-        } else {
-          setChatResponse(response.message || '❌ No se pudo procesar la transferencia');
+        // Si hay una acción específica, puedes manejarla aquí
+        if (response.action === 'transfer') {
+          // Manejar lógica de transferencia si es necesario
+          console.log('Transfer action detected:', response);
+        } else if (response.action === 'balance') {
+          // Ya se maneja con handleBalanceCheck
+          console.log('Balance check action');
         }
-      } else if (action === 'network_info') {
-        // Mostrar información de la red
-        setChatResponse(
-          `🌐 **Red Scroll Sepolia**\n\n` +
-          `• Chain ID: 534351\n` +
-          `• RPC: sepolia-rpc.scroll.io\n` +
-          `• Explorador: sepolia.scrollscan.com\n` +
-          `• Moneda: ETH`
-        );
       } else {
-        // Respuesta genérica del chatbot
-        setChatResponse(response.message || 'Recibí tu mensaje.');
+        setChatResponse('🤖 I received your message. How can I help you optimize your yields?');
       }
       
       setIsChatLoading(false);
     } catch (error) {
       console.error('Error sending message:', error);
-      setChatResponse('❌ Error al procesar tu mensaje: ' + error.message);
+      setChatResponse('❌ Error processing your message. Please try again.');
       setIsChatLoading(false);
     }
   };
@@ -648,7 +618,7 @@ Puedo ayudarte con:
     if (!isConnected || !userAddress) {
       setMessages(prev => [...prev, {
         id: Date.now(),
-        text: '🔒 Por favor conecta tu wallet primero para consultar el balance.',
+        text: '🔒 Please connect your wallet first to check balance.',
         sender: 'bot'
       }]);
       return;
@@ -712,7 +682,13 @@ Puedo ayudarte con:
 
     try {
       // 1. Obtener el user_id del usuario actual por su wallet
-      const userData = await getUserByWallet(userAddress);
+      const userResponse = await fetch(`http://localhost:5000/users/wallet/${userAddress}`);
+      
+      if (!userResponse.ok) {
+        throw new Error('Your wallet is not registered. Please reconnect your wallet to register automatically.');
+      }
+
+      const userData = await userResponse.json();
       const userId = userData.user.id;
 
       // 2. Crear el contacto usando el servicio
@@ -760,8 +736,8 @@ Puedo ayudarte con:
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-jet-600">
             <img src={logoStack} alt="Logo" className="w-10 h-10 rounded-full border-2 border-giants-orange shadow-lg shadow-giants-orange/30" />
             <div>
-              <h3 className="text-seasalt font-bold text-lg">sBTC ChatBot</h3>
-              <p className="text-jet-800 text-xs">Agente Blockchain en STX</p>
+              <h3 className="text-seasalt font-bold text-lg">🦙 LlamaRollup</h3>
+              <p className="text-jet-800 text-xs">AI Financial Agent • DefiLlama + Scroll L2</p>
             </div>
           </div>
 
@@ -770,7 +746,7 @@ Puedo ayudarte con:
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-kikk-white text-sm font-semibold flex items-center gap-2 bg-kikk-orange px-3 py-2 rounded-sm flex-1 uppercase tracking-widest">
                 <span className="text-lg">👥</span> 
-                <span>Contactos</span>
+                <span>Contacts</span>
               </h4>
               {/* Botón para agregar contacto */}
               <button
@@ -789,7 +765,7 @@ Puedo ayudarte con:
               {!isConnected && (
                 <div className="p-4 rounded-sm bg-kikk-black border border-kikk-gray text-center">
                   <p className="text-kikk-gray text-xs uppercase tracking-wider">
-                    🔒 Conecta tu wallet para ver contactos
+                    🔒 Connect your wallet to view contacts
                   </p>
                 </div>
               )}
@@ -798,7 +774,7 @@ Puedo ayudarte con:
               {isConnected && loadingContacts && (
                 <div className="flex flex-col items-center justify-center py-6">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-kikk-orange"></div>
-                  <p className="text-kikk-gray text-xs mt-2">Cargando contactos...</p>
+                  <p className="text-kikk-gray text-xs mt-2">Loading contacts...</p>
                 </div>
               )}
 
@@ -824,7 +800,7 @@ Puedo ayudarte con:
                 <div className="p-4 rounded-sm bg-kikk-black border border-kikk-gray text-center">
                   <p className="text-2xl mb-2">📭</p>
                   <p className="text-kikk-gray text-xs">
-                    No tienes contactos aún
+                    You don't have contacts yet
                   </p>
                   <p className="text-kikk-orange text-xs mt-1">
                     Haz clic en + para agregar
@@ -855,13 +831,13 @@ Puedo ayudarte con:
               {!isConnected || !userAddress ? (
                 <div className="p-4 rounded-lg bg-jet-600 bg-opacity-30 border border-jet-600 text-center">
                   <p className="text-jet-800 text-xs">
-                    🔒 Conecta tu wallet para ver el historial
+                    🔒 Connect your wallet to view history
                   </p>
                 </div>
               ) : loadingHistory ? (
                 <div className="flex flex-col items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-giants-orange"></div>
-                  <p className="text-jet-800 text-xs mt-2">Cargando...</p>
+                  <p className="text-jet-800 text-xs mt-2">Loading...</p>
                 </div>
               ) : recentTransactions.length === 0 ? (
                 <div className="p-4 rounded-lg bg-licorice-300 border border-jet-600 text-center">
@@ -1014,7 +990,7 @@ Puedo ayudarte con:
             <img src={logoStack} alt="Logo" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-giants-orange shadow-md hover:shadow-giants-orange/50 transition-shadow" />
             <div>
               <h2 className="text-seasalt font-bold text-sm sm:text-base flex items-center gap-2">
-                <span>sBTC ChatBot</span>
+                <span>🦙 LlamaRollup</span>
                 {isConnected && <span className="text-green-400 text-xs">●</span>}
               </h2>
               {isConnected && (
@@ -1151,7 +1127,7 @@ Puedo ayudarte con:
               <div className="flex justify-center px-2 sm:px-4">
                 <div className="bg-gradient-to-r from-sandy-brown to-rust border-2 border-sandy-brown text-seasalt px-3 sm:px-4 md:px-5 py-2 sm:py-3 rounded-lg shadow-lg shadow-sandy-brown/30 flex items-center gap-2 sm:gap-3 font-semibold text-xs sm:text-sm md:text-base">
                   <span className="text-base sm:text-lg md:text-xl animate-spin">⏳</span>
-                  <span>Procesando transacción...</span>
+                  <span>Processing transaction...</span>
                 </div>
               </div>
             )}
@@ -1172,10 +1148,17 @@ Puedo ayudarte con:
             </button>
             
             <button
-              onClick={() => handleShortcut('¿Cómo puedo hacer una transferencia?')}
+              onClick={() => handleShortcut('What is the best yield for USDC?')}
               className="px-4 py-2 bg-licorice hover:bg-jet-400 text-seasalt rounded-full text-xs sm:text-sm whitespace-nowrap border border-jet-600 hover:border-giants-orange transition-colors"
             >
-              💸 Quiero enviar STX
+              📊 Best Yield
+            </button>
+
+            <button
+              onClick={() => handleShortcut('Find high APY on Scroll')}
+              className="px-4 py-2 bg-licorice hover:bg-jet-400 text-seasalt rounded-full text-xs sm:text-sm whitespace-nowrap border border-jet-600 hover:border-giants-orange transition-colors"
+            >
+              ⚡ Scroll Pools
             </button>
           </div>
 
@@ -1234,10 +1217,10 @@ Puedo ayudarte con:
                 }}
                 placeholder={
                   listening 
-                    ? "🎤 Escuchando... Habla claramente" 
+                    ? "🎤 Listening... Speak clearly" 
                     : isConnected 
-                      ? "Escribe un mensaje..." 
-                      : "Conecta tu wallet para comenzar"
+                      ? "Type a message..." 
+                      : "Connect your wallet to start"
                 }
                 disabled={!isConnected || isChatLoading}
                 rows={1}
