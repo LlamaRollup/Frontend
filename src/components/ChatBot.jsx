@@ -6,7 +6,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAccount, useDisconnect, useBalance } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { getSTXTransfers } from '../services/chatService';
+import { getSTXTransfers, sendChatMessage } from '../services/chatService';
 import TransactionHistory from './TransactionHistory';
 import logoStack from '../assets/logo_stack.png';
 import logoChatBot from '../assets/logoChatBot.png';
@@ -486,15 +486,29 @@ How can I help you today?`,
 
     setIsChatLoading(true);
     try {
-      // Aquí puedes implementar la lógica de tu chatbot
-      // Por ahora, solo simularemos una respuesta
-      setTimeout(() => {
-        setChatResponse(`Recibí tu mensaje: "${message}". (Funcionalidad del chatbot en desarrollo)`);
-        setIsChatLoading(false);
-      }, 1000);
+      // Llamar al backend con el mensaje y la wallet del usuario
+      const response = await sendChatMessage(message, userAddress);
+      
+      // Procesar la respuesta del backend
+      if (response && response.message) {
+        setChatResponse(response.message);
+        
+        // Si hay una acción específica, puedes manejarla aquí
+        if (response.action === 'transfer') {
+          // Manejar lógica de transferencia si es necesario
+          console.log('Transfer action detected:', response);
+        } else if (response.action === 'balance') {
+          // Ya se maneja con handleBalanceCheck
+          console.log('Balance check action');
+        }
+      } else {
+        setChatResponse('🤖 I received your message. How can I help you optimize your yields?');
+      }
+      
+      setIsChatLoading(false);
     } catch (error) {
       console.error('Error sending message:', error);
-      setChatResponse('❌ Error al procesar tu mensaje.');
+      setChatResponse('❌ Error processing your message. Please try again.');
       setIsChatLoading(false);
     }
   };
