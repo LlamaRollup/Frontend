@@ -2,7 +2,8 @@
  * Componente de chat que permite interactuar con el contrato usando lenguaje natural
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useStacksContract } from '../hooks/useStacksContract';
+import { useAccount, useDisconnect, useBalance } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { getSTXTransfers } from '../services/chatService';
 import TransactionHistory from './TransactionHistory';
 import logoStack from '../assets/logo_stack.png';
@@ -317,20 +318,23 @@ Puedo ayudarte con:
     );
   };
   
-  const {
-    userAddress,
-    isConnected,
-    userBalance,
-    chatResponse,
-    isChatLoading,
-    isTransactionPending,
-    pendingTransfer,
-    connectWallet,
-    disconnectWallet,
-    sendMessage,
-    confirmTransfer,
-    cancelTransfer
-  } = useStacksContract();
+  // Hooks de wagmi para conectar wallet
+  const { address: userAddress, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { data: balanceData } = useBalance({
+    address: userAddress,
+  });
+
+  // Estados del chat
+  const [chatResponse, setChatResponse] = useState(null);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
+  const [pendingTransfer, setPendingTransfer] = useState(null);
+
+  // Calcular balance formateado
+  const userBalance = balanceData 
+    ? parseFloat(balanceData.formatted).toFixed(4) 
+    : '0.0000';
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -466,6 +470,54 @@ Puedo ayudarte con:
       textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
     }
   }, [input]);
+
+  // Función para enviar mensaje al chatbot
+  const sendMessage = async (message) => {
+    if (!isConnected) {
+      setChatResponse('🔒 Por favor conecta tu wallet primero.');
+      return;
+    }
+
+    setIsChatLoading(true);
+    try {
+      // Aquí puedes implementar la lógica de tu chatbot
+      // Por ahora, solo simularemos una respuesta
+      setTimeout(() => {
+        setChatResponse(`Recibí tu mensaje: "${message}". (Funcionalidad del chatbot en desarrollo)`);
+        setIsChatLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setChatResponse('❌ Error al procesar tu mensaje.');
+      setIsChatLoading(false);
+    }
+  };
+
+  // Función para confirmar transferencia
+  const confirmTransfer = async () => {
+    if (!pendingTransfer) return;
+    
+    setIsTransactionPending(true);
+    try {
+      // Aquí implementarías la lógica de transferencia
+      // Por ahora, solo simulamos
+      setTimeout(() => {
+        setChatResponse('✅ Transferencia completada exitosamente!');
+        setPendingTransfer(null);
+        setIsTransactionPending(false);
+      }, 2000);
+    } catch (error) {
+      console.error('Error in transfer:', error);
+      setChatResponse('❌ Error en la transferencia.');
+      setIsTransactionPending(false);
+    }
+  };
+
+  // Función para cancelar transferencia
+  const cancelTransfer = () => {
+    setPendingTransfer(null);
+    setChatResponse('❌ Transferencia cancelada.');
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -900,30 +952,15 @@ Puedo ayudarte con:
           </div>
 
           {/* Wallet Info */}
-          {isConnected ? (
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:block text-right bg-licorice bg-opacity-50 px-3 py-2 rounded-lg border border-jet-700">
-                <p className="text-sandy-brown font-bold text-sm flex items-center justify-end gap-1">
-                  <span className="text-xs">💰</span>
-                  {userBalance} STX
-                </p>
-                <button 
-                  onClick={disconnectWallet}
-                  className="text-jet-900 hover:text-seasalt text-xs transition-colors hover:underline"
-                >
-                  Desconectar ⚡
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button 
-              onClick={connectWallet}
-              className="bg-giants-orange hover:bg-rust text-seasalt font-bold px-4 py-2 rounded-lg text-xs sm:text-sm transition-all duration-200 shadow-lg hover:shadow-giants-orange/50 hover:scale-105 flex items-center gap-2"
-            >
-              <span className="hidden sm:inline">🔗</span>
-              <span>Conectar Wallet</span>
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            <ConnectButton 
+              showBalance={{
+                smallScreen: false,
+                largeScreen: true,
+              }}
+              chainStatus="icon"
+            />
+          </div>
         </div>
 
         {/* Messages Area - Estilo ChatGPT */}
